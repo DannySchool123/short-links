@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Link Shortener</title>
+    <title>Simple Link Shortener</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <h1>GitHub Link Shortener</h1>
+    <h1>Simple Link Shortener</h1>
 
     <div>
         <h3>Create Short Link</h3>
@@ -27,14 +27,40 @@
         <p id="shortLinkResult"></p>
     </div>
 
-    <script>
-        const GITHUB_USERNAME = "DannySchool123"; // Your GitHub username
-        const REPO_NAME = "short-links"; // Your repository name
-        const BRANCH_NAME = "main"; // Repository branch
-        const FILE_NAME = "urlDatabase.json"; // File to store data
-        const PAT = "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"; // Don't expose the PAT in the frontend
+    <div>
+        <h3>Decode Short Link</h3>
+        <input id="shortCode" type="text" placeholder="Enter Short Code">
+        <button onclick="decodeShortLink()">Decode</button>
+        <p id="originalLinkResult"></p>
+    </div>
 
-        const urlDatabase = {}; // Object to store URL mappings
+    <script>
+        const urlDatabase = {}; // Object to store original URLs with short codes
+
+        function createShortLink() {
+            const originalLink = document.getElementById('originalLink').value.trim();
+            if (originalLink) {
+                const shortCode = generateShortCode(); // Generate a short code
+                urlDatabase[shortCode] = originalLink; // Store the URL with the short code
+                document.getElementById('shortLinkResult').innerText = `Short Code: ${shortCode}`;
+            } else {
+                alert("Please enter a valid URL!");
+            }
+        }
+
+        function decodeShortLink() {
+            const shortCode = document.getElementById('shortCode').value.trim();
+            if (shortCode) {
+                const originalLink = urlDatabase[shortCode]; // Retrieve the URL using the short code
+                if (originalLink) {
+                    document.getElementById('originalLinkResult').innerText = `Original Link: ${originalLink}`;
+                } else {
+                    alert("Short code not found!");
+                }
+            } else {
+                alert("Please enter a valid short code!");
+            }
+        }
 
         function generateShortCode() {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -44,44 +70,7 @@
             }
             return code;
         }
-
-        async function createShortLink() {
-            const originalLink = document.getElementById('originalLink').value.trim();
-            if (!originalLink) {
-                alert("Please enter a valid URL!");
-                return;
-            }
-
-            const shortCode = generateShortCode();
-            urlDatabase[shortCode] = originalLink;
-
-            try {
-                const urlDatabaseJson = JSON.stringify(urlDatabase, null, 2);
-                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${FILE_NAME}`;
-                const response = await fetch(apiUrl, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `Bearer ${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}`, // Authenticate with your PAT
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: "Update URL database",
-                        content: btoa(urlDatabaseJson), // Encode data as Base64
-                        branch: BRANCH_NAME
-                    })
-                });
-
-                if (response.ok) {
-                    document.getElementById('shortLinkResult').innerText = `Short Code: ${shortCode}`;
-                    console.log("Data successfully saved to GitHub!");
-                } else {
-                    const error = await response.json();
-                    console.error("GitHub API Error:", error.message);
-                }
-            } catch (error) {
-                console.error("Error during GitHub API call:", error);
-            }
-        }
     </script>
 </body>
 </html>
+
