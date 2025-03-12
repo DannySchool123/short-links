@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub-Integrated Link Shortener</title>
+    <title>GitHub Link Shortener</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <h1>GitHub-Integrated Link Shortener</h1>
+    <h1>GitHub Link Shortener</h1>
 
     <div>
         <h3>Create Short Link</h3>
@@ -28,13 +28,13 @@
     </div>
 
     <script>
-        const GITHUB_USERNAME = "your-username"; // Replace with your GitHub username
-        const REPO_NAME = "short-links"; // Replace with your GitHub repository name
-        const BRANCH_NAME = "main"; // Replace with the branch name (default: main)
-        const FILE_NAME = "urlDatabase.json"; // Name of the file where data will be stored
-        const PAT = "your-personal-access-token"; // Replace with your GitHub PAT
+        const GITHUB_USERNAME = "DannySchool123"; // Your GitHub username
+        const REPO_NAME = "short-links"; // Your repository name
+        const BRANCH_NAME = "main"; // Repository branch
+        const FILE_NAME = "urlDatabase.json"; // File to store data
+        const PAT = "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"; // Don't expose the PAT in the frontend
 
-        const urlDatabase = {}; // Object to store URLs with short codes
+        const urlDatabase = {}; // Object to store URL mappings
 
         function generateShortCode() {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -61,12 +61,12 @@
                 const response = await fetch(apiUrl, {
                     method: "PUT",
                     headers: {
-                        "Authorization": `Bearer ${PAT}`,
+                        "Authorization": `Bearer ${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}`, // Authenticate with your PAT
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         message: "Update URL database",
-                        content: btoa(urlDatabaseJson), // Encode file content to Base64
+                        content: btoa(urlDatabaseJson), // Encode data as Base64
                         branch: BRANCH_NAME
                     })
                 });
