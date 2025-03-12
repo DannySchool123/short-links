@@ -1,103 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compact URL Encoder</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f9;
-      text-align: center;
-      padding: 20px;
-    }
-    textarea, button {
-      margin: 10px;
-      padding: 10px;
-      width: 80%;
-      max-width: 400px;
-    }
-    textarea {
-      height: 100px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      margin: 5px;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .output {
-      margin-top: 20px;
-      font-size: 1.2rem;
-      color: #333;
-    }
-  </style>
-</head>
-<body>
-  <h1>Compact URL Encoder & Decoder</h1>
-  <textarea id="input" placeholder="Enter your URL or encoded string here..."></textarea><br>
-  <button onclick="encode()">Encode</button>
-  <button onclick="decode()">Decode</button>
-  <button onclick="copyToClipboard()">Copy Output</button>
-  <div class="output" id="output"></div>
-  <script>
-    // Mapping two-letter combinations to symbols
-    const mapping = {
-      "aa": "&", "ab": "@", "ac": "*", "ad": "%", "ae": "#",
-      "ba": "!", "bb": "$", "bc": "^", "bd": "(", "be": ")",
-      "ca": "-", "cb": "+", "cc": "=", "cd": "[", "ce": "]",
-      "da": "{", "db": "}", "dc": "|", "dd": "\\", "de": ":",
-      "ea": ";", "eb": "'", "ec": '"', "ed": "<", "ee": ">"
-      // Add all combinations for full coverage as needed
-    };
+<script>
+  // Mapping two-letter combinations to symbols
+  const mapping = {
+    "aa": "&", "ab": "@", "ac": "*", "ad": "%", "ae": "#",
+    "ba": "!", "bb": "$", "bc": "^", "bd": "(", "be": ")",
+    "ca": "-", "cb": "+", "cc": "=", "cd": "[", "ce": "]",
+    "da": "{", "db": "}", "dc": "|", "dd": "\\", "de": ":",
+    "ea": ";", "eb": "'", "ec": '"', "ed": "<", "ee": ">"
+    // Add all combinations as necessary
+  };
 
-    const reverseMapping = Object.fromEntries(
-      Object.entries(mapping).map(([key, value]) => [value, key])
-    );
+  const reverseMapping = Object.fromEntries(
+    Object.entries(mapping).map(([key, value]) => [value, key])
+  );
 
-    // Encode function
-    function encode() {
-      const input = document.getElementById("input").value;
-      let encoded = "";
-      for (let i = 0; i < input.length; i += 2) {
-        const pair = input.slice(i, i + 2); // Get two characters at a time
-        if (pair.length === 2) {
-          encoded += mapping[pair] || pair; // Encode pair or leave as-is
-        } else {
-          encoded += pair; // If single character remains, leave it as-is
-        }
-      }
-      document.getElementById("output").textContent = encoded;
-    }
-
-    // Decode function
-    function decode() {
-      const input = document.getElementById("input").value;
-      let decoded = "";
-      for (const char of input) {
-        decoded += reverseMapping[char] || char; // Decode or leave as-is
-      }
-      document.getElementById("output").textContent = decoded;
-    }
-
-    // Copy to Clipboard function
-    function copyToClipboard() {
-      const outputText = document.getElementById("output").textContent;
-      if (outputText) {
-        navigator.clipboard.writeText(outputText).then(() => {
-          alert("Output copied to clipboard!");
-        }).catch(err => {
-          alert("Failed to copy: " + err);
-        });
+  function encode() {
+    const input = document.getElementById("input").value;
+    let encoded = "";
+    for (let i = 0; i < input.length; i += 2) {
+      const pair = input.slice(i, i + 2); // Two characters at a time
+      if (pair.length === 2) {
+        encoded += (mapping[pair] || pair) + "-"; // Add dash separator
       } else {
-        alert("Nothing to copy!");
+        encoded += pair; // Leftover single character
       }
     }
-  </script>
-</body>
-</html>
+    encoded = encoded.endsWith("-") ? encoded.slice(0, -1) : encoded; // Remove trailing dash
+    displayOutput(encoded);
+  }
+
+  function decode() {
+    const input = document.getElementById("input").value;
+    const segments = input.split("-"); // Split by dashes
+    let decoded = "";
+    for (const segment of segments) {
+      decoded += reverseMapping[segment] || segment; // Decode or leave as-is
+    }
+    displayOutput(decoded);
+  }
+
+  function copyToClipboard() {
+    const outputElement = document.getElementById("output");
+    const outputText = outputElement.textContent;
+
+    if (outputText) {
+      navigator.clipboard.writeText(outputText).then(() => {
+        alert("Output copied to clipboard!");
+      }).catch(err => {
+        alert("Failed to copy: " + err);
+      });
+    } else {
+      alert("Nothing to copy!");
+    }
+  }
+
+  function displayOutput(content) {
+    const outputElement = document.getElementById("output");
+    outputElement.textContent = content;
+    outputElement.classList.remove("hidden");
+  }
+</script>
