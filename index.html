@@ -3,99 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>URL Encoder & Decoder</title>
+  <title>Comprehensive Encoder</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(to bottom right, #6a11cb, #2575fc);
-      color: white;
-    }
-    .container {
       text-align: center;
-      background: rgba(255, 255, 255, 0.1);
+      background-color: #f7f9fc;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-      width: 80%;
-      max-width: 500px;
     }
-    .input-box, .output-box {
-      width: 90%;
+    textarea, button {
+      margin: 10px;
       padding: 10px;
-      margin: 10px auto;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-    }
-    .btn {
-      background: #6a11cb;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .btn:hover {
-      background: #2575fc;
+      width: 80%;
+      max-width: 400px;
     }
     .output {
-      margin-top: 15px;
-      font-size: 1.1rem;
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>URL Encoder & Decoder</h1>
-    <textarea class="input-box" id="input" rows="3" placeholder="Enter your URL here..."></textarea>
-    <div>
-      <button class="btn" onclick="encodeURL()">Encode</button>
-      <button class="btn" onclick="decodeURL()">Decode</button>
-    </div>
-    <div class="output" id="output"></div>
-  </div>
-
+  <h1>Two-Letter Combination Encoder</h1>
+  <textarea id="input" placeholder="Enter URL here..."></textarea><br>
+  <button onclick="encode()">Encode</button>
+  <button onclick="decode()">Decode</button>
+  <div class="output" id="output"></div>
   <script>
-    // Encoding and Decoding logic using substitution cipher
-    const cipher = {
-      'A': '1', 'B': '2', 'C': '3', 'D': '4', 'E': '5', 'F': '6', 'G': '7', 'H': '8', 'I': '9', 'J': '10',
-      'K': '11', 'L': '12', 'M': '13', 'N': '14', 'O': '15', 'P': '16', 'Q': '17', 'R': '18', 'S': '19', 'T': '20',
-      'U': '21', 'V': '22', 'W': '23', 'X': '24', 'Y': '25', 'Z': '26',
-      'a': '27', 'b': '28', 'c': '29', 'd': '30', 'e': '31', 'f': '32', 'g': '33', 'h': '34', 'i': '35', 'j': '36',
-      'k': '37', 'l': '38', 'm': '39', 'n': '40', 'o': '41', 'p': '42', 'q': '43', 'r': '44', 's': '45', 't': '46',
-      'u': '47', 'v': '48', 'w': '49', 'x': '50', 'y': '51', 'z': '52',
-      '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
-      '.': '53', '/': '54', ':': '55', '-': '56'
-    };
+    // Generate two-letter mappings dynamically
+    const mapping = {};
+    const reverseMapping = {};
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    let symbolIndex = 33; // Start with '!' as a symbol
 
-    const reverseCipher = Object.fromEntries(Object.entries(cipher).map(([key, value]) => [value, key]));
+    for (const first of letters) {
+      for (const second of letters) {
+        const pair = first + second;
+        const symbol = String.fromCharCode(symbolIndex++);
+        mapping[pair] = symbol;
+        reverseMapping[symbol] = pair;
 
-    function encodeURL() {
-      const input = document.getElementById("input").value;
-      let encoded = "";
-      for (const char of input) {
-        encoded += cipher[char] ? cipher[char] + "-" : "";
+        // Wrap around symbols if we exhaust simple printable characters
+        if (symbolIndex > 126) symbolIndex = 33;
       }
-      document.getElementById("output").innerText = encoded.slice(0, -1);
     }
 
-    function decodeURL() {
+    // Encoding function
+    function encode() {
       const input = document.getElementById("input").value;
-      const codes = input.split("-");
-      let decoded = "";
-      for (const code of codes) {
-        decoded += reverseCipher[code] ? reverseCipher[code] : "";
+      let encoded = "";
+      for (let i = 0; i < input.length; i += 2) {
+        const pair = input.slice(i, i + 2);
+        if (mapping[pair]) {
+          encoded += mapping[pair];
+        } else if (pair.length === 1) {
+          encoded += pair; // Leave single leftover characters as-is
+        }
       }
-      document.getElementById("output").innerText = decoded;
+      document.getElementById("output").textContent = "Encoded: " + encoded;
+    }
+
+    // Decoding function
+    function decode() {
+      const input = document.getElementById("input").value;
+      let decoded = "";
+      for (const char of input) {
+        decoded += reverseMapping[char] ? reverseMapping[char] : char;
+      }
+      document.getElementById("output").textContent = "Decoded: " + decoded;
     }
   </script>
 </body>
 </html>
+
